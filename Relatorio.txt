@@ -1,0 +1,13 @@
+Relatório Gerador de Imediatos
+
+Qual a razão do embaralhamento dos bits do imediato no RiscV ?
+    A razão do embaralhamento dos bits do imediato no RiscV é para facilitar a implementação de certas instruções e otimizar o uso do hardware, tornando mais flexível o seu uso.
+
+Por que alguns imediatos não incluem o bit 0 ?
+    Alguns imediatos não incluem o bit 0 porque eles são usados em instruções que operam em palavras alinhadas a endereços de múltiplos de 2 bytes. Como esses endereços são sempre pares, o bit 0 é sempre 0.
+
+Os imediatos de operações lógicas estendem o sinal ?
+    Sim, os imediatos foram tratados de forma a extender o sinal, preenchendo os bits mais significativos. Esse é o padrão, para garantir que as operações lógicas sejam executadas corretamente.
+
+Como é implementada a instrução NOT no RiscV?
+    A instrução NOT no RiscV é implementada utilizando a instrução XOR com um imediato de valor -1 (todos os bits setados em 1), uma vez que, em RiscV, não existe uma instrução NOT dedicada.
