@@ -1,0 +1,2 @@
+Qual a opção usada para simular a constante zero em XREGS[0]?
+A opção utilizada foi ter condicionais para avaliar o endereço. Caso seja colocado o endereço 0x0 nos registradores, o retorno é zero.
