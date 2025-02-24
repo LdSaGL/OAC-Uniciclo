@@ -8,12 +8,11 @@ end entity xregs_tb;
 architecture xregs_tb_arch of xregs_tb is
 
     component XREGS is
-        generic (WSIZE : natural := 32);
         port (
             clk, wren: in std_logic; 
             rs1, rs2, rd: in std_logic_vector(4 downto 0);
-            data: in std_logic_vector(WSIZE-1 downto 0); 
-            ro1, ro2: out std_logic_vector(WSIZE-1 downto 0));
+            data: in std_logic_vector(31 downto 0); 
+            ro1, ro2: out std_logic_vector(31 downto 0));
     end component;
 
     signal clk, wren: std_logic := '0';

@@ -5,12 +5,9 @@ use ieee.std_logic_textio.all;
 use std.textio.all;
 
 entity inst_mem is
-    generic (
-        WSIZE : natural := 32; -- Tamanho da instrução (32 bits)
-        WADDR : natural := 11); -- Endereços para até 2048 instruções
     port (
-        address : in std_logic_vector(WADDR - 1 downto 0);
-        Q       : out std_logic_vector(WSIZE - 1 downto 0)
+        address : in std_logic_vector(10 downto 0);
+        Q       : out std_logic_vector(31 downto 0)
     );
 end entity inst_mem;
 

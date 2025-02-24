@@ -5,16 +5,13 @@ use ieee.std_logic_textio.all;
 use std.textio.all;
 
 entity data_mem is
-    generic (
-        SIZE    : natural := 32;
-        WADDR   : natural := 13);
     port (
-        address	    : in std_logic_vector (WADDR - 1 downto 0);
+        address	    : in std_logic_vector (12 downto 0);
         clk	        : in std_logic;
-        data	    : in std_logic_vector (SIZE - 1 downto 0);
+        data	    : in std_logic_vector (31 downto 0);
         wren	    : in std_logic;
         mem_read    : in std_logic;
-        Q		    : out std_logic_vector (SIZE - 1 downto 0) := (others => '0'));
+        Q		    : out std_logic_vector (31 downto 0) := (others => '0'));
 end entity data_mem;
 
 architecture data_mem_arch of data_mem is

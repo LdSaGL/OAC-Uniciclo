@@ -8,33 +8,21 @@ entity inst_mem_tb is
 end entity inst_mem_tb;
 
 architecture tb_arch of inst_mem_tb is
-    -- Parâmetros
-    constant WSIZE : natural := 32;
-    constant WADDR : natural := 11;
-
     -- Componente da memória de instruções
     component inst_mem
-        generic (
-            WSIZE : natural;
-            WADDR : natural
-        );
         port (
-            address : in std_logic_vector(WADDR - 1 downto 0);
-            Q       : out std_logic_vector(WSIZE - 1 downto 0)
+            address : in std_logic_vector(10 downto 0);
+            Q       : out std_logic_vector(31 downto 0)
         );
     end component;
 
     -- Sinais
-    signal address : std_logic_vector(WADDR - 1 downto 0) := (others => '0');
-    signal Q       : std_logic_vector(WSIZE - 1 downto 0);
+    signal address : std_logic_vector(10 downto 0) := (others => '0');
+    signal Q       : std_logic_vector(31 downto 0);
 
 begin
     -- Instancia a memória de instruções
     uut: inst_mem
-        generic map (
-            WSIZE => WSIZE,
-            WADDR => WADDR
-        )
         port map (
             address => address,
             Q       => Q

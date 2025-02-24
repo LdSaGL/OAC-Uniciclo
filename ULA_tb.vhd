@@ -8,11 +8,10 @@ end entity ulaRV_tb;
 architecture ulaRV_tb_arch of ulaRV_tb is
 
     component ulaRV is
-        generic (WSIZE : natural := 32);
         port (
             opcode : in std_logic_vector(3 downto 0);
-            A, B : in std_logic_vector(WSIZE-1 downto 0);
-            Z : out std_logic_vector(WSIZE-1 downto 0);
+            A, B : in std_logic_vector(31 downto 0);
+            Z : out std_logic_vector(31 downto 0);
             zero : out std_logic);
     end component ulaRV;
 

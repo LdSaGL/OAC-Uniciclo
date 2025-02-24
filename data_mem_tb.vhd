@@ -6,15 +6,13 @@ entity tb_data_mem is
 end tb_data_mem;
 
 architecture tb_arch of tb_data_mem is
-    constant SIZE  : natural := 32;
-    constant WADDR : natural := 13;
     
     signal clk      : std_logic := '0';
-    signal address  : std_logic_vector(WADDR - 1 downto 0);
-    signal data     : std_logic_vector(SIZE - 1 downto 0) := (others => '0');
+    signal address  : std_logic_vector(12 downto 0);
+    signal data     : std_logic_vector(31 downto 0) := (others => '0');
     signal wren     : std_logic := '0';
     signal mem_read : std_logic := '0';
-    signal Q        : std_logic_vector(SIZE - 1 downto 0);
+    signal Q        : std_logic_vector(31 downto 0);
 
     constant CLK_PERIOD : time := 10 ns;
 
@@ -25,22 +23,18 @@ architecture tb_arch of tb_data_mem is
             WADDR   : natural := 13
         );
         port (
-            address     : in std_logic_vector (WADDR - 1 downto 0);
+            address     : in std_logic_vector (12 downto 0);
             clk         : in std_logic;
-            data        : in std_logic_vector (SIZE - 1 downto 0);
+            data        : in std_logic_vector (31 downto 0);
             wren        : in std_logic;
             mem_read    : in std_logic;
-            Q           : out std_logic_vector (SIZE - 1 downto 0)
+            Q           : out std_logic_vector (31 downto 0)
         );
     end component;
 
 begin
     -- Instanciação da memória
     uut: data_mem
-        generic map (
-            SIZE  => SIZE,
-            WADDR => WADDR
-        )
         port map (
             address  => address,
             clk      => clk,
