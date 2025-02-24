@@ -28,6 +28,15 @@ architecture control_arch of control is
                     memWrite    <= '0';
                     aluSrc      <= '0';
                     regWrite    <= '1';
+                
+                when "0010011" => -- I-Type: ADDI, SLTI, ANDI, ORI, XORI, SLLI, SRLI, SRAI
+                    branch      <= '0';
+                    memRead     <= '0';
+                    memToReg    <= '0';
+                    aluOp       <= "11";
+                    memWrite    <= '0';
+                    aluSrc      <= '1';
+                    regWrite    <= '1';
 
                 when "0000011" => -- ILoad-Type: LB, LW, LBU
                     branch      <= '0';

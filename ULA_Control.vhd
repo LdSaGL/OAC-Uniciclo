@@ -61,6 +61,30 @@ begin
                         aluCtrl <= "0111"; -- and
                     when others => aluCtrl <= "0000"; -- default case
                 end case;
+            when "11" => -- I-Type
+                case funct3 is
+                    when "000" => -- addi
+                        aluCtrl <= "0000"; -- add
+                    when "001" => -- slli
+                        aluCtrl <= "1001"; -- sll
+                    when "010" => -- slti
+                        aluCtrl <= "1010"; -- slt
+                    when "011" => -- sltiu
+                        aluCtrl <= "1011"; -- sltu
+                    when "100" => -- xori
+                        aluCtrl <= "1100"; -- xor
+                    when "101" => -- srli or srai
+                        if (funct7 = '1') then
+                            aluCtrl <= "1101"; -- sra
+                        else
+                            aluCtrl <= "1110"; -- srl
+                        end if;
+                    when "110" => -- ori
+                        aluCtrl <= "1111"; -- or
+                    when "111" => -- andi
+                        aluCtrl <= "0111"; -- and
+                    when others => aluCtrl <= "0000"; -- default case
+		        end case;
             when others => aluCtrl <= "0000"; -- default case
         end case;
     end process;
