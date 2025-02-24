@@ -41,8 +41,22 @@ architecture rtl of rv_uniciclo is
 
     component inst_mem is
         port (
-            address : in  std_logic_vector(10 downto 0);
+            address : in  std_logic_vector(9 downto 0);
             Q 	    : out std_logic_vector(31 downto 0)
+        );
+    end component;
+
+    component immGen is
+        port (
+            instruction : in  std_logic_vector(31 downto 0);
+            imm         : out std_logic_vector(31 downto 0)
+        );
+    end component;
+
+    component ShiftLeft is
+        port (
+            imm_in  : in  std_logic_vector(31 downto 0);
+            imm_out : out std_logic_vector(31 downto 0)
         );
     end component;
 
@@ -86,13 +100,13 @@ architecture rtl of rv_uniciclo is
             aluOp      : out std_logic_vector(1 downto 0);
             memWrite   : out std_logic;
             aluSrc     : out std_logic;
-            regWrite   : out std_logic;
+            regWrite   : out std_logic
         );
     end component;
 
     component data_mem is
         port (
-            address	    : in std_logic_vector (12 downto 0);
+            address	    : in std_logic_vector (9 downto 0);
             clk	        : in std_logic;
             data	    : in std_logic_vector (31 downto 0);
             wren	    : in std_logic;
@@ -114,9 +128,13 @@ architecture rtl of rv_uniciclo is
     signal ulaResult     : std_logic_vector(31 downto 0);
     signal regA, regB    : std_logic_vector(31 downto 0);
     signal imm32         : std_logic_vector(31 downto 0);
+    signal shifted_imm32 : std_logic_vector(31 downto 0);
+
 
     signal ulaCtrl     : std_logic_vector(3 downto 0);
     signal ulaOp       : std_logic_vector(1 downto 0);
+    signal zero : std_logic;
+
 
     signal branch      : std_logic;
     signal memRead     : std_logic;
@@ -125,6 +143,9 @@ architecture rtl of rv_uniciclo is
     signal aluSrc      : std_logic;
     signal regWrite    : std_logic;
 
+    signal branch_condition : std_logic;
+
+
     -- Alias dos campos da instrucao
     alias opcode_field   : std_logic_vector(6 downto 0) is instruction(6 downto 0);
     alias rs1_field      : std_logic_vector(4 downto 0) is instruction(19 downto 15);
@@ -132,8 +153,8 @@ architecture rtl of rv_uniciclo is
     alias rd_field       : std_logic_vector(4 downto 0) is instruction(11 downto 7);
     alias funct3_field   : std_logic_vector(2 downto 0) is instruction(14 downto 12);
     alias funct7_field   : std_logic is instruction(30);
-    alias instr_mem_addr : std_logic_vector(10 downto 0) is PCout(11 downto 02);
-    alias data_mem_addr  : std_logic_vector(12 downto 0) is ulaResult(11 downto 02);
+    alias instr_mem_addr : std_logic_vector(9 downto 0) is PCout(11 downto 2);
+    alias data_mem_addr  : std_logic_vector(9 downto 0) is ulaResult(11 downto 2);
 
 begin
 
@@ -164,7 +185,7 @@ begin
         branch      => branch,
         memRead     => memRead,
         memToReg    => memToReg,
-        aluOp       => aluOp,
+        aluOp       => ulaOp,
         memWrite    => memWrite,
         aluSrc      => aluSrc,
         regWrite    => regWrite
@@ -187,7 +208,7 @@ begin
     );
 
     ula_control_inst : ula_control port map (
-        aluOp   => aluOp,
+        aluOp   => ulaOp,
         funct3  => funct3_field,
         funct7  => funct7_field,
         aluCtrl => ulaCtrl
@@ -205,7 +226,7 @@ begin
         A       => ulaA,
         B       => ulaB,
         Z       => ulaResult,
-        zero    => open
+        zero    => zero
     );
 
     shift_left_inst : ShiftLeft port map (
@@ -219,10 +240,12 @@ begin
         sum     => PCcond
     );
 
+    branch_condition <= branch and (not zero);
+
     muxPC_inst : mux port map (
         mux_input1  => PCplus4,
         mux_input2  => PCcond,
-        sel         => (branch and (not zero)),
+        sel         => branch_condition,
         mux_out     => PCin
     );
 

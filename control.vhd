@@ -24,7 +24,7 @@ architecture control_arch of control is
                     branch      <= '0';
                     memRead     <= '0';
                     memToReg    <= '0';
-                    aluOp       <= '10';
+                    aluOp       <= "10";
                     memWrite    <= '0';
                     aluSrc      <= '0';
                     regWrite    <= '1';

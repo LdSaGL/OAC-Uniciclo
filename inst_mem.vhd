@@ -6,7 +6,7 @@ use std.textio.all;
 
 entity inst_mem is
     port (
-        address : in std_logic_vector(10 downto 0);
+        address : in std_logic_vector(9 downto 0);
         Q       : out std_logic_vector(31 downto 0)
     );
 end entity inst_mem;
