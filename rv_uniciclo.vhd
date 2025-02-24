@@ -102,18 +102,18 @@ architecture rtl of rv_uniciclo is
     end component;
 
     -- Sinais internos
-    signal PCout        : std_logic_vector(31 downto 0) := (others => '0');
-    signal PCin         : std_logic_vector(31 downto 0) := (others => '0');
-    signal instruction  : std_logic_vector(31 downto 0);
-    signal PCplus4      : std_logic_vector(31 downto 0);
-    signal PCcond       : std_logic_vector(31 downto 0);
-    signal regData      : std_logic_vector(31 downto 0);
-    signal rd_data      : std_logic_vector(31 downto 0);
-    signal data_mem_ou  : std_logic_vector(31 downto 0);
-    signal ulaA, ulaB   : std_logic_vector(31 downto 0);
-    signal ulaResult    : std_logic_vector(31 downto 0);
-    signal regA, regB   : std_logic_vector(31 downto 0);
-    signal imm32        : std_logic_vector(31 downto 0);
+    signal PCout         : std_logic_vector(31 downto 0) := (others => '0');
+    signal PCin          : std_logic_vector(31 downto 0) := (others => '0');
+    signal instruction   : std_logic_vector(31 downto 0);
+    signal PCplus4       : std_logic_vector(31 downto 0);
+    signal PCcond        : std_logic_vector(31 downto 0);
+    signal regData       : std_logic_vector(31 downto 0);
+    signal rd_data       : std_logic_vector(31 downto 0);
+    signal data_mem_out  : std_logic_vector(31 downto 0);
+    signal ulaA, ulaB    : std_logic_vector(31 downto 0);
+    signal ulaResult     : std_logic_vector(31 downto 0);
+    signal regA, regB    : std_logic_vector(31 downto 0);
+    signal imm32         : std_logic_vector(31 downto 0);
 
     signal ulaCtrl     : std_logic_vector(3 downto 0);
     signal ulaOp       : std_logic_vector(1 downto 0);
@@ -141,4 +141,104 @@ begin
 
     -- Instanciacao dos componentes
 
+    PC_inst : PC port map (
+        clk     => clk,
+        rst     => rst,
+        pc_in   => PCin,
+        pc_out  => PCout
+    );
+
+    inst_mem_inst : inst_mem port map (
+        address => instr_mem_addr,
+        Q       => instruction
+    );
+
+    adderPC4_inst : adder port map (
+        a       => PCout,
+        b       => "00000000000000000000000000000100",
+        sum     => PCplus4
+    );
+
+    control_inst : control port map (
+        opcode      => opcode_field,
+        branch      => branch,
+        memRead     => memRead,
+        memToReg    => memToReg,
+        aluOp       => aluOp,
+        memWrite    => memWrite,
+        aluSrc      => aluSrc,
+        regWrite    => regWrite
+    );
+
+    xregs_inst : xregs port map (
+        clk     => clk,
+        wren    => regWrite,
+        rs1     => rs1_field,
+        rs2     => rs2_field,
+        rd      => rd_field,
+        data    => regData,
+        ro1     => regA,
+        ro2     => regB
+    );
+
+    immGen_inst : immGen port map (
+        instruction => instruction,
+        imm         => imm32
+    );
+
+    ula_control_inst : ula_control port map (
+        aluOp   => aluOp,
+        funct3  => funct3_field,
+        funct7  => funct7_field,
+        aluCtrl => ulaCtrl
+    );
+
+    ulaB_mux_inst : mux port map (
+        mux_input1  => regB,
+        mux_input2  => imm32,
+        sel         => aluSrc,
+        mux_out     => ulaB
+    );
+
+    ulaRV_inst : ulaRV port map (
+        opcode  => ulaCtrl,
+        A       => ulaA,
+        B       => ulaB,
+        Z       => ulaResult,
+        zero    => open
+    );
+
+    shift_left_inst : ShiftLeft port map (
+        imm_in  => imm32,
+        imm_out => shifted_imm32
+    );
+
+    jump_adder_inst : adder port map (
+        a       => PCout,
+        b       => shifted_imm32,
+        sum     => PCcond
+    );
+
+    muxPC_inst : mux port map (
+        mux_input1  => PCplus4,
+        mux_input2  => PCcond,
+        sel         => (branch and (not zero)),
+        mux_out     => PCin
+    );
+
+    data_mem_inst : data_mem port map (
+        address     => data_mem_addr,
+        clk         => clk,
+        data        => regB,
+        wren        => memWrite,
+        mem_read    => memRead,
+        Q           => data_mem_out
+    );
+
+    memToReg_mux_inst : mux port map (
+        mux_input1  => ulaResult,
+        mux_input2  => data_mem_out,
+        sel         => memToReg,
+        mux_out     => rd_data
+    );
 end architecture rtl;
