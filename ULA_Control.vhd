@@ -7,85 +7,74 @@ entity ula_control is
         aluOp   : in std_logic_vector(1 downto 0);
         funct3  : in std_logic_vector(2 downto 0); -- op dentro do opcode
         funct7  : in std_logic; -- determina se e add/sub ou sra/srl
-        aluCtrl : out std_logic_vector(3 downto 0));
+        aluCtrl : out std_logic_vector(3 downto 0) := (others => '0'));
 end ula_control;
 
 architecture behavioral of ula_control is
 begin
-    process(aluOp, funct7, funct3)
+    process(aluOp, funct3, funct7)
     begin
         case aluOp is
-            when "00" => -- acesso memoria
-                aluCtrl <= "0000"; -- add
-            when "01" => -- branch
+            -- load/store usa add para calcular endereço
+            when "00" =>
+                aluCtrl <= "0000"; -- ADD
+
+            -- B-Type - operaçoes de branch
+            when "01" =>
                 case funct3 is
-                    when "000" => -- beq
-                        aluCtrl <= "0001"; -- seq
-                    when "001" => -- bne
-                        aluCtrl <= "0010"; -- sne
-                    when "100" => -- blt
-                        aluCtrl <= "0011"; -- slt
-                    when "101" => -- bge
-                        aluCtrl <= "0100"; -- sge
-                    when "110" => -- bltu
-                        aluCtrl <= "0101"; -- sltu
-                    when "111" => -- bgeu
-                        aluCtrl <= "0110"; -- sgeu
-                    when others => aluCtrl <= "0000"; -- default case
+                    when "000" => aluCtrl <= "1100"; -- BEQ (SEQ)
+                    when "001" => aluCtrl <= "1101"; -- BNE (SNE)
+                    when "100" => aluCtrl <= "1000"; -- BLT (SLT)
+                    when "101" => aluCtrl <= "1010"; -- BGE (SGE)
+                    when "110" => aluCtrl <= "1001"; -- BLTU (SLTU)
+                    when "111" => aluCtrl <= "1011"; -- BGEU (SGEU)
+                    when others => aluCtrl <= "0000";
                 end case;
-            when "10" => -- R-Type
+
+            -- R-Type - operaçoes com registradores
+            when "10" =>
                 case funct3 is
-                    when "000" => -- add or sub
-                        if (funct7 = '1') then
-                            aluCtrl <= "1000"; -- sub
+                    when "000" => 
+                        if funct7 = '1' then
+                            aluCtrl <= "0001"; -- SUB
                         else
-                            aluCtrl <= "0000"; -- add
+                            aluCtrl <= "0000"; -- ADD
                         end if;
-                    when "001" => -- sll
-                        aluCtrl <= "1001"; -- sll
-                    when "010" => -- slt
-                        aluCtrl <= "1010"; -- slt
-                    when "011" => -- sltu
-                        aluCtrl <= "1011"; -- sltu
-                    when "100" => -- xor
-                        aluCtrl <= "1100"; -- xor
-                    when "101" => -- srl or sra
-                        if (funct7 = '1') then
-                            aluCtrl <= "1101"; -- sra
+                    when "111" => aluCtrl <= "0010"; -- AND
+                    when "001" => aluCtrl <= "0101"; -- SLL
+                    when "010" => aluCtrl <= "1000"; -- SLT
+                    when "011" => aluCtrl <= "1001"; -- SLTU
+                    when "100" => aluCtrl <= "0100"; -- XOR
+                    when "101" => 
+                        if funct7 = '1' then
+                            aluCtrl <= "0111"; -- SRA
                         else
-                            aluCtrl <= "1110"; -- srl
+                            aluCtrl <= "0110"; -- SRL
                         end if;
-                    when "110" => -- or
-                        aluCtrl <= "1111"; -- or
-                    when "111" => -- and
-                        aluCtrl <= "0111"; -- and
-                    when others => aluCtrl <= "0000"; -- default case
+                    when "110" => aluCtrl <= "0011"; -- OR
+                    when others => aluCtrl <= "0000"; -- Caso default (ADD)
                 end case;
-            when "11" => -- I-Type
+
+            -- I-Type - operacoes com imediatos
+            when "11" =>
                 case funct3 is
-                    when "000" => -- addi
-                        aluCtrl <= "0000"; -- add
-                    when "001" => -- slli
-                        aluCtrl <= "1001"; -- sll
-                    when "010" => -- slti
-                        aluCtrl <= "1010"; -- slt
-                    when "011" => -- sltiu
-                        aluCtrl <= "1011"; -- sltu
-                    when "100" => -- xori
-                        aluCtrl <= "1100"; -- xor
-                    when "101" => -- srli or srai
-                        if (funct7 = '1') then
-                            aluCtrl <= "1101"; -- sra
+                    when "000" => aluCtrl <= "0000"; -- ADDI (ADD)
+                    when "001" => aluCtrl <= "0101"; -- SLLI
+                    when "010" => aluCtrl <= "1000"; -- SLTI
+                    when "011" => aluCtrl <= "1001"; -- SLTIU
+                    when "100" => aluCtrl <= "0100"; -- XORI
+                    when "101" => 
+                        if funct7 = '1' then
+                            aluCtrl <= "0111"; -- SRAI
                         else
-                            aluCtrl <= "1110"; -- srl
+                            aluCtrl <= "0110"; -- SRLI
                         end if;
-                    when "110" => -- ori
-                        aluCtrl <= "1111"; -- or
-                    when "111" => -- andi
-                        aluCtrl <= "0111"; -- and
-                    when others => aluCtrl <= "0000"; -- default case
-		        end case;
-            when others => aluCtrl <= "0000"; -- default case
+                    when "110" => aluCtrl <= "0011"; -- ORI
+                    when "111" => aluCtrl <= "0010"; -- ANDI
+                    when others => aluCtrl <= "0000";
+                end case;
+
+            when others => aluCtrl <= "0000"; 
         end case;
     end process;
 end architecture behavioral;

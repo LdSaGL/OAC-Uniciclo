@@ -5,7 +5,7 @@ use ieee.numeric_std.all;
 entity ShiftLeft is
 	port(
 			imm_in : in std_logic_vector(31 downto 0);
-			imm_out : out std_logic_vector(31 downto 0));
+			imm_out : out std_logic_vector(31 downto 0) := (others => '0'));
 end ShiftLeft;
 
 architecture arch of ShiftLeft is

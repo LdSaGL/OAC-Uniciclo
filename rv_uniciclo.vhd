@@ -121,10 +121,9 @@ architecture rtl of rv_uniciclo is
     signal instruction   : std_logic_vector(31 downto 0);
     signal PCplus4       : std_logic_vector(31 downto 0);
     signal PCcond        : std_logic_vector(31 downto 0);
-    signal regData       : std_logic_vector(31 downto 0);
-    signal rd_data       : std_logic_vector(31 downto 0);
+    signal rd_data       : std_logic_vector(31 downto 0); -- Dado a ser escrito no registrador
     signal data_mem_out  : std_logic_vector(31 downto 0);
-    signal ulaA, ulaB    : std_logic_vector(31 downto 0);
+    signal ulaB          : std_logic_vector(31 downto 0);
     signal ulaResult     : std_logic_vector(31 downto 0);
     signal regA, regB    : std_logic_vector(31 downto 0);
     signal imm32         : std_logic_vector(31 downto 0);
@@ -133,7 +132,7 @@ architecture rtl of rv_uniciclo is
 
     signal ulaCtrl     : std_logic_vector(3 downto 0);
     signal ulaOp       : std_logic_vector(1 downto 0);
-    signal zero : std_logic;
+    signal zero        : std_logic;
 
 
     signal branch      : std_logic;
@@ -223,7 +222,7 @@ begin
 
     ulaRV_inst : ulaRV port map (
         opcode  => ulaCtrl,
-        A       => ulaA,
+        A       => regA,
         B       => ulaB,
         Z       => ulaResult,
         zero    => zero
@@ -262,6 +261,6 @@ begin
         mux_input1  => ulaResult,
         mux_input2  => data_mem_out,
         sel         => memToReg,
-        mux_out     => regData
+        mux_out     => rd_data
     );
 end architecture rtl;

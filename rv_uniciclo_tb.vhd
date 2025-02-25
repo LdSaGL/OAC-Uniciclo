@@ -22,11 +22,12 @@ begin
     rv_uniciclo_i: rv_uniciclo port map(clock_in, rst, data_out);
 
     clk_gen: process begin
-        clock_in <= '1'; wait for 100 ns;
-        clock_in <= '0'; wait for 100 ns;
+        clock_in <= '1'; wait for 1 ns;
+        clock_in <= '0'; wait for 1 ns;
     end process clk_gen;
 
     drive: process begin
+        rst <= '1'; wait for 4 ns;
         rst <= '0';
    		wait;
    end process drive;

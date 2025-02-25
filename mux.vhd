@@ -11,5 +11,5 @@ end mux;
 
 architecture mux_arch of mux is   
 begin
-    mux_out <= mux_input1 when sel = '1' else mux_input2;
+    mux_out <= mux_input1 when sel = '0' else mux_input2;
 end mux_arch ;
