@@ -197,7 +197,7 @@ begin
         rs1     => rs1_field,
         rs2     => rs2_field,
         rd      => rd_field,
-        data    => regData,
+        data    => rd_data,
         ro1     => regA,
         ro2     => regB
     );
@@ -240,7 +240,7 @@ begin
         sum     => PCcond
     );
 
-    branch_condition <= branch and (not zero);
+    branch_condition <= branch and zero;
 
     muxPC_inst : mux port map (
         mux_input1  => PCplus4,
@@ -262,6 +262,6 @@ begin
         mux_input1  => ulaResult,
         mux_input2  => data_mem_out,
         sel         => memToReg,
-        mux_out     => rd_data
+        mux_out     => regData
     );
 end architecture rtl;
