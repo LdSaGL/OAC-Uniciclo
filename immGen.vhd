@@ -28,7 +28,7 @@ begin
             when "1101111" =>  -- UJ-type
                 imm <= std_logic_vector(resize(signed(instruction(31) & instruction(19 downto 12) & instruction(20) & instruction(30 downto 21) & "0"), 32));
 
-            when "0110111" =>  -- U-type
+            when "0110111" | "0010111" =>  -- U-type
                 imm <= std_logic_vector(resize(signed(instruction(31 downto 12) & "000000000000"), 32));
 
             when others =>  -- zerar em todos os casos não mapeados

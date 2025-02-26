@@ -31,6 +31,14 @@
             );
         end component;
 
+        component muxUtype is
+            port (
+                mux_input1, mux_input2, mux_input3 : in  std_logic_vector(31 downto 0);
+                sel				                : in  std_logic_vector(1 downto 0);
+                mux_out				            : out std_logic_vector(31 downto 0)
+            );
+        end component;
+
         component adder is
             port (
                 a	    : in  std_logic_vector(31 downto 0);
@@ -100,7 +108,8 @@
                 aluOp      : out std_logic_vector(1 downto 0);
                 memWrite   : out std_logic;
                 aluSrc     : out std_logic;
-                regWrite   : out std_logic
+                regWrite   : out std_logic;
+                luiOrAuipc : out  std_logic_vector(1 downto 0)
             );
         end component;
 
@@ -123,6 +132,7 @@
         signal PCcond        : std_logic_vector(31 downto 0);
         signal rd_data       : std_logic_vector(31 downto 0); -- Dado a ser escrito no registrador
         signal data_mem_out  : std_logic_vector(31 downto 0);
+        signal ulaA          : std_logic_vector(31 downto 0);
         signal ulaB          : std_logic_vector(31 downto 0);
         signal ulaResult     : std_logic_vector(31 downto 0);
         signal regA, regB    : std_logic_vector(31 downto 0);
@@ -141,8 +151,11 @@
         signal memWrite    : std_logic;
         signal aluSrc      : std_logic;
         signal regWrite    : std_logic;
+        signal luiOrAuipc  : std_logic_vector(1 downto 0);
 
         signal branch_condition : std_logic;
+
+        signal zero32 : std_logic_vector(31 downto 0) := (others => '0');
 
 
         -- Alias dos campos da instrucao
@@ -187,7 +200,8 @@
             aluOp       => ulaOp,
             memWrite    => memWrite,
             aluSrc      => aluSrc,
-            regWrite    => regWrite
+            regWrite    => regWrite,
+            luiOrAuipc  => luiOrAuipc
         );
 
         xregs_inst : xregs port map (
@@ -213,6 +227,14 @@
             aluCtrl => ulaCtrl
         );
 
+        ulaA_mux_inst: muxUtype port map (
+            mux_input1  => regA,
+            mux_input2  => zero32,
+            mux_input3  => PCout,
+            sel         => luiOrAuipc,
+            mux_out     => ulaA
+        );
+
         ulaB_mux_inst : mux port map (
             mux_input1  => regB,
             mux_input2  => imm32,
@@ -222,7 +244,7 @@
 
         ulaRV_inst : ulaRV port map (
             opcode  => ulaCtrl,
-            A       => regA,
+            A       => ulaA,
             B       => ulaB,
             Z       => ulaResult,
             zero    => zero

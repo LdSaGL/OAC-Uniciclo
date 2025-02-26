@@ -11,7 +11,8 @@ entity control is
         aluOp    : out std_logic_vector(1 downto 0);
         memWrite : out std_logic;
         aluSrc   : out std_logic;
-        regWrite : out std_logic
+        regWrite : out std_logic;
+        luiOrAuipc : out std_logic_vector(1 downto 0)
     );
 end control;
 
@@ -28,6 +29,7 @@ architecture control_arch of control is
                     memWrite    <= '0';
                     aluSrc      <= '0';
                     regWrite    <= '1';
+                    luiOrAuipc  <= "00";
                 
                 when "0010011" => -- I-Type: ADDI, SLTI, ANDI, ORI, XORI, SLLI, SRLI, SRAI
                     branch      <= '0';
@@ -37,6 +39,7 @@ architecture control_arch of control is
                     memWrite    <= '0';
                     aluSrc      <= '1';
                     regWrite    <= '1';
+                    luiOrAuipc  <= "00";
 
                 when "0000011" => -- ILoad-Type: LB, LW, LBU
                     branch      <= '0';
@@ -46,6 +49,7 @@ architecture control_arch of control is
                     memWrite    <= '0';
                     aluSrc      <= '1';
                     regWrite    <= '1';
+                    luiOrAuipc  <= "00";
 
                 when "0100011" => -- S-Type: SW, SB
                     branch      <= '0';
@@ -55,6 +59,7 @@ architecture control_arch of control is
                     memWrite    <= '1';
                     aluSrc      <= '1';
                     regWrite    <= '0';
+                    luiOrAuipc  <= "00";
 
                 when "1100011" => -- B-Type: BEQ, BNE
                     branch      <= '1';
@@ -64,7 +69,28 @@ architecture control_arch of control is
                     memWrite    <= '0';
                     aluSrc      <= '0';
                     regWrite    <= '0';
-                    
+                    luiOrAuipc  <= "00";
+
+                when "0110111"  => -- U-Type: LUI
+                    branch      <= '0';
+                    memRead     <= '0';
+                    memToReg    <= '0';
+                    aluOp       <= "00";
+                    memWrite    <= '0';
+                    aluSrc      <= '1';
+                    regWrite    <= '1';
+                    luiOrAuipc  <= "01";
+
+                when "0010111"  => -- U-Type: AUIPC
+                    branch      <= '0';
+                    memRead     <= '0';
+                    memToReg    <= '0';
+                    aluOp       <= "00";
+                    memWrite    <= '0';
+                    aluSrc      <= '1';
+                    regWrite    <= '1';
+                    luiOrAuipc  <= "10";
+
                 when others => null;
             end case ;
         end process;
